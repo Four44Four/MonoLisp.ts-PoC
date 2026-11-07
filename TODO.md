@@ -1,3 +1,6 @@
+ - Optionally integrate Quicklisp and other ASDF systems into the backend as library packages/dependencies
+    - Must respect existing framework philosophies about tight type control and integration into the existing server functions system
+
  - Serverside realtime data streaming support
     - Client to server
     - Server to client
