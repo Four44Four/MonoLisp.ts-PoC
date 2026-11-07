@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Monolisp dashboard</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; background: #f6f7f9; color: #1d2330; }
+      .dashboard header { display: flex; align-items: baseline; gap: 1rem; }
+      .updated { color: #667; }
+      .error { color: #b00020; }
+      .series { display: flex; flex-wrap: wrap; gap: 1rem; }
+      .card { background: white; border-radius: 8px; padding: 0.75rem 1rem; box-shadow: 0 1px 3px #0002; }
+      .card h3 { margin: 0; text-transform: uppercase; font-size: 0.8rem; color: #667; }
+      .card .value { margin: 0.25rem 0; font-size: 1.6rem; font-weight: 600; }
+      .services ul { list-style: none; padding: 0; }
+      .services li { padding: 0.2rem 0; }
+      .status-up::before { content: "● "; color: #2e9e44; }
+      .status-degraded::before { content: "● "; color: #e0a100; }
+      .status-down::before { content: "● "; color: #d32f2f; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- build/ is written by `npm run build:dashboard` (main.clientx.lisp -> build/main.tsx) -->
+    <script type="module" src="/build/main.tsx"></script>
+  </body>
+</html>

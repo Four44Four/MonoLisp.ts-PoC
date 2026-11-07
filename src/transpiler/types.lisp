@@ -1,0 +1,100 @@
+;;;; src/transpiler/types.lisp -- Lisp type specifiers -> TypeScript types
+
+(in-package :monolisp.transpiler)
+
+(defparameter *simple-type-map*
+  '(("SYMBOL" . "string") ("KEYWORD" . "string") ("CHARACTER" . "string") ("STRING" . "string")
+    ("SIMPLE-STRING" . "string") ("BASE-STRING" . "string")
+    ("NUMBER" . "number | bigint") ("REAL" . "number") ("RATIONAL" . "number")
+    ("FLOAT" . "number") ("DOUBLE-FLOAT" . "number") ("SINGLE-FLOAT" . "number") ("SHORT-FLOAT" . "number")
+    ("LONG-FLOAT" . "number") ("FIXNUM" . "number") ("INTEGER" . "number") ("UNSIGNED-BYTE" . "number")
+    ("SIGNED-BYTE" . "number") ("BIT" . "number")
+    ("BIGNUM" . "bigint")
+    ("RATIO" . "{ numerator: bigint; denominator: bigint }")
+    ("COMPLEX" . "{ real: number; imag: number }")
+    ("ARRAY" . "any[]") ("VECTOR" . "any[]") ("SIMPLE-VECTOR" . "any[]") ("SIMPLE-ARRAY" . "any[]")
+    ("SEQUENCE" . "any[]") ("LIST" . "any[]")
+    ("BIT-VECTOR" . "Uint8Array") ("SIMPLE-BIT-VECTOR" . "Uint8Array")
+    ("HASH-TABLE" . "Map<any, any>")
+    ("BOOLEAN" . "boolean") ("NULL" . "null") ("ANY" . "any") ("UNKNOWN" . "unknown") ("NEVER" . "never")
+    ("VOID" . "void") ("OBJECT" . "object") ("FUNCTION" . "(...args: any[]) => any")
+    ("PROMISE" . "Promise<any>") ("ELEMENT" . "Element") ("EVENT" . "Event") ("DATE" . "Date")
+    ("REGEXP" . "RegExp") ("ERROR" . "Error") ("CONDITION" . "Error") ("UNDEFINED" . "undefined")))
+
+(defvar *struct-ts-name-hook* nil
+  "Function of a symbol returning the TS interface name of a known frontend struct, or NIL.")
+
+(defun union-wrap (ts)
+  (if (or (search " => " ts) (find #\| ts)) (paren ts) ts))
+
+(defun type->ts (spec)
+  "TypeScript type text for the Lisp type specifier SPEC.  Unknown specs become `any`."
+  (cond
+    ((null spec) "null")
+    ((eq spec t) "any")
+    ((eq spec :undefined) "undefined")
+    ((eq spec :true) "true")
+    ((eq spec :false) "false")
+    ((keywordp spec) (js-string (format nil ":~A" (property-name spec))))
+    ((stringp spec) (js-string spec))
+    ((numberp spec) (js-number spec))
+    ((symbolp spec)
+     (let ((name (symbol-name spec)))
+       (or (cdr (assoc name *simple-type-map* :test #'string=))
+           (and *struct-ts-name-hook* (funcall *struct-ts-name-hook* spec))
+           (mangle-type-name spec))))
+    ((consp spec)
+     (let ((op (sym-name (car spec))) (args (cdr spec)))
+       (cond
+         ((null op) "any")
+         ((string= op "OR") (join (mapcar (lambda (a) (union-wrap (type->ts a))) args) " | "))
+         ((string= op "AND") (join (mapcar (lambda (a) (union-wrap (type->ts a))) args) " & "))
+         ((string= op "NOT") "unknown")
+         ((string= op "SATISFIES") "any")
+         ((string= op "EQL") (type->ts (first args)))
+         ((string= op "MEMBER") (join (mapcar #'type->ts args) " | "))
+         ((string= op "NULLABLE") (format nil "~A | null" (union-wrap (type->ts (first args)))))
+         ((string= op "OPTIONAL") (format nil "~A | undefined" (union-wrap (type->ts (first args)))))
+         ((member op '("ARRAY" "VECTOR" "SIMPLE-ARRAY" "SIMPLE-VECTOR") :test #'string=)
+          (if (and args (not (eq (first args) '*)))
+              (let ((inner (type->ts (first args))))
+                (if (or (find #\| inner) (find #\Space inner)) (format nil "(~A)[]" inner) (format nil "~A[]" inner)))
+              "any[]"))
+         ((string= op "READONLY-ARRAY") (format nil "readonly ~A[]" (union-wrap (type->ts (first args)))))
+         ((string= op "HASH-TABLE") (format nil "Map<~A, ~A>" (type->ts (first args)) (type->ts (or (second args) t))))
+         ((member op '("RECORD" "MAP") :test #'string=)
+          (format nil "Record<~A, ~A>" (type->ts (first args)) (type->ts (or (second args) t))))
+         ((string= op "PROMISE") (format nil "Promise<~A>" (type->ts (first args))))
+         ((member op '("TUPLE" "VALUES") :test #'string=) (format nil "[~{~A~^, ~}]" (mapcar #'type->ts args)))
+         ((string= op "FUNCTION")
+          (let ((params (if (eq (first args) '*) '() (first args)))
+                (ret (if (second args) (second args) t)))
+            (format nil "(~{~A~^, ~}) => ~A"
+                    (loop with optional = nil with rest = nil
+                          for p in params for i from 0
+                          append (cond ((sym-is p "&OPTIONAL") (setf optional t) nil)
+                                       ((sym-is p "&REST") (setf rest t) nil)
+                                       ((sym-is p "&KEY") nil)
+                                       (rest (list (format nil "...rest: ~A[]" (type->ts p))))
+                                       (optional (list (format nil "arg~D?: ~A" i (type->ts p))))
+                                       (t (list (format nil "arg~D: ~A" i (type->ts p))))))
+                    (if (and (consp ret) (sym-is (car ret) "VALUES"))
+                        (type->ts ret)
+                        (type->ts ret)))))
+         ((member op '("INTEGER" "FLOAT" "REAL" "RATIONAL" "FIXNUM" "UNSIGNED-BYTE" "SIGNED-BYTE" "MOD" "DOUBLE-FLOAT" "SINGLE-FLOAT") :test #'string=) "number")
+         ((member op '("STRING" "SIMPLE-STRING") :test #'string=) "string")
+         ((string= op "OBJECT")
+          (format nil "{ ~{~A~^ ~} }"
+                  (mapcar (lambda (f)
+                            (destructuring-bind (key ftype &rest opts) f
+                              (format nil "~A~:[~;?~]: ~A;" (property-name key) (member :optional opts) (type->ts ftype))))
+                          args)))
+         ((string= op "KEYOF") (format nil "keyof ~A" (type->ts (first args))))
+         ((string= op "TYPEOF") (format nil "typeof ~A" (mangle-name (first args))))
+         ;; Generic application of a foreign type: (Foo A B) -> Foo<A, B>
+         (t (format nil "~A<~{~A~^, ~}>" (mangle-type-name (car spec)) (mapcar #'type->ts args))))))
+    (t "any")))
+
+(defun ts-type-annotation (spec)
+  "\": T\" or \"\" for an unknown/absent type."
+  (if spec (format nil ": ~A" (type->ts spec)) ""))

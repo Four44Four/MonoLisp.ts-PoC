@@ -1,0 +1,29 @@
+{
+  "name": "monolisp-ts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monolisp.ts -- monolithic full-stack application server in Common Lisp (frontend Lisp dialect -> TypeScript)",
+  "type": "module",
+  "scripts": {
+    "test": "sbcl --script scripts/run-tests.lisp",
+    "build:example": "sbcl --script scripts/build-example.lisp",
+    "serve:example": "sbcl --script scripts/build-example.lisp --serve",
+    "dev:example": "vite examples/todo",
+    "build:guestbook": "sbcl --script scripts/build-example.lisp --example guestbook",
+    "serve:guestbook": "sbcl --script scripts/build-example.lisp --example guestbook --serve",
+    "dev:guestbook": "vite examples/guestbook",
+    "build:dashboard": "sbcl --script scripts/build-example.lisp --example dashboard",
+    "serve:dashboard": "sbcl --script scripts/build-example.lisp --example dashboard --serve",
+    "dev:dashboard": "vite examples/dashboard",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck:example": "tsc --noEmit -p examples/todo/tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.7",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.6.0",
+    "vite": "^8.3.5"
+  }
+}

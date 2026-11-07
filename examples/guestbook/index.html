@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Monolisp guestbook</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; color: #1d2330; }
+      [hidden] { display: none !important; }
+      form { display: flex; gap: 0.5rem; margin: 1rem 0; }
+      input, select, button { font: inherit; padding: 0.35rem 0.6rem; }
+      #message { flex: 1; }
+      #error { background: #fdecea; color: #b00020; padding: 0.5rem 0.75rem; border-radius: 6px; }
+      #entries { list-style: none; padding: 0; }
+      .entry { border-left: 4px solid #ccc; padding: 0.4rem 0.75rem; margin: 0.6rem 0; background: #fafafa; }
+      .entry header { font-size: 0.85rem; color: #667; }
+      .entry p { margin: 0.3rem 0; }
+      .mood-happy { border-color: #2e9e44; }
+      .mood-sad { border-color: #4c78a8; }
+    </style>
+  </head>
+  <body>
+    <h1>Guestbook</h1>
+    <p id="whoami">Loading...</p>
+    <p id="error" hidden></p>
+
+    <form id="sign-in-form" hidden>
+      <input id="name" placeholder="Your name" maxlength="40" required />
+      <button type="submit">Sign in</button>
+    </form>
+
+    <form id="post-form" hidden>
+      <input id="message" placeholder="Say something nice" maxlength="280" />
+      <select id="mood">
+        <option value="happy">happy</option>
+        <option value="neutral" selected>neutral</option>
+        <option value="sad">sad</option>
+      </select>
+      <button type="submit">Post</button>
+    </form>
+    <button id="sign-out" hidden>Sign out</button>
+
+    <ul id="entries"></ul>
+    <button id="more" hidden>Older entries</button>
+
+    <!-- build/ is written by `npm run build:guestbook` (main.client.lisp -> build/main.ts) -->
+    <script type="module" src="/build/main.ts"></script>
+  </body>
+</html>

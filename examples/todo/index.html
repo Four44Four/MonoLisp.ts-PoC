@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Monolisp todos</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 36rem; margin: 2rem auto; padding: 0 1rem; color: #1d2330; }
+      input, button { font: inherit; padding: 0.3rem 0.5rem; }
+      form { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+      ul { padding-left: 0; list-style: none; }
+      li { display: flex; align-items: center; gap: 0.5rem; padding: 0.2rem 0; }
+      li.done .title { text-decoration: line-through; color: #889; }
+      .tag { font-size: 0.75rem; background: #eef; padding: 0 0.4rem; border-radius: 4px; }
+      .error { color: #b00020; }
+      .suggestions { display: flex; gap: 0.5rem; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- build/ is written by `npm run build:example` (main.clientx.lisp -> build/main.tsx) -->
+    <script type="module" src="/build/main.tsx"></script>
+  </body>
+</html>
