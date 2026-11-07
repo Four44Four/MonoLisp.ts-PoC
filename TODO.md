@@ -1,0 +1,15 @@
+ - Serverside realtime data streaming support
+    - Client to server
+    - Server to client
+    - Configurable to be simplex or full duplex
+    - Must be hardened as it presents a new potential attack vector
+    - Existing example: WebSockets, EventSource (SSE)
+
+ - Integration of a Common Lisp SQL webserver (for PostgreSQL or MySQL) for direct client to database communication with type safety
+    - Client calls a normal looking function
+       - That function is a backend defined server function running right at the DB
+       - Can execute DB level operations without needing to pass through edge server nodes (lowers latency for data intensive webapps)
+       - Can subscribe to receive realtime data updates from the DB
+    - Could be built on a MonoLisp server (?)
+       - Would need to support 1 MonoLisp frontend being able to transpile against multiple MonoLisp backends
+    - See [PostgREST](https://github.com/postgrest/postgrest)
