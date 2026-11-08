@@ -91,7 +91,7 @@
   :on-receive (lambda (conn-in data-in) ...))
 ...
 (dotimes (i 10)
-   (send-realtime data-streaming-thingymajigy-1
+   (server-send-realtime data-streaming-thingymajigy-1
       (write-to-string i)))
 ...
 ;; `*-realtime` receiving functions will always try to accumulate connection data fragments until the message is complete and they can be reassembled into the specified `:type`
@@ -122,8 +122,8 @@
           (:const :multi (realtime-conn set-realtime-conn (use-state nil)))
           (:const send-message (lambda ()
                                  (when realtime-conn
-                                    (send-realtime realtime-conn
-                                                   "{\"add\": 15}")))))
+                                    (client-send-realtime realtime-conn
+                                                          "{\"add\": 15}")))))
       (use-effect
          :callback (connect-realtime data-streaming-thingymajigy-1
                      :on-connect (lambda (conn-in)
