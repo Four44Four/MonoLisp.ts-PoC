@@ -44,14 +44,20 @@
     - To accomodate the use of them in both the JSON-RPC2 endpoints and the realtime data endpoints
 
 # More complex things
+ - Support splitting up a monorepo backend into different deployable backends
+    - Developer can allocate specific JSON-RPC2 functions can be ran on different backend deployments
+    - Include guide on how to go through the process of building these backends for development/testing and production for dummies
+    - Try to make the developer-facing process as similar to deploying a monorepo as a single backend deployment
+       - Contrast the differences in the guide
+
  - Serverside realtime data streaming support
     - Client to server
     - Server to client
     - Configurable to be simplex or full duplex
     - Must be hardened as it presents a new potential attack vector
     - Existing example: WebSockets, EventSource (SSE)
-    - TODO: decide how the realtime connections should specify a websocket server
-    - TODO: decide how the websocket server should be ran, also coded in Lisp ? there should be a way to decouple them from the main application server to be deployed as separate edge nodes to distribute websocket connections between different backend hosts
+    - TODO: decide how the realtime connections should specify a websocket/SSE server
+    - TODO: decide how the websocket/SEE server should be ran, also coded in Lisp ? there should be a way to decouple them from the main application server to be deployed as separate edge nodes to distribute websocket/SEE connections between different backend hosts (probably leverage the backend JSON-RPC2 endpoint optional splitting to design how the websocket/SSE server backend can be created as integrated with a JSON-RPC2 backend deployment or as its own standalone backend deployment)
 ```lisp
 ;; server
 ...
