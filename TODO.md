@@ -5,7 +5,8 @@
  - Optionally integrate Quicklisp and other ASDF systems into the backend as library packages/dependencies
     - Must respect existing framework philosophies about tight type control and integration into the existing server functions system
 
- - `defvar` with `:multi` and `:const` support
+ - `defvar` with `:multi` and `:const` support for frontend Lisp
+    - Replace any current `defvar`, `defparameter`, or `defconstant` implementation in frontend Lisp right now (check documentation, tests, source code, and examples) 
 ```lisp
 (defvar my-var "hi") ;; let myVar = "hi"
 (defvar :const my-var "hi") ;; const myVar = "hi"
