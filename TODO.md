@@ -109,7 +109,7 @@
                                     (funcall set-my-int
                                              (lambda (prev-my-int)
                                                 (+ prev-my-int (parse-int data-in)))))
-         :clean-up (close-realtime data-streaming-thingymajigy-1)))
+         :clean-up (close-conn-realtime realtime-conn)))
       (as-html-string
          (:div (:p "hello world !!")
                (:p my-int)
