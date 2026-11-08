@@ -50,14 +50,24 @@
     - Try to make the developer-facing process as similar to deploying a monorepo as a single backend deployment
        - Contrast the differences in the guide
 
- - Serverside realtime data streaming support
-    - Client to server
-    - Server to client
-    - Configurable to be simplex or full duplex
-    - Must be hardened as it presents a new potential attack vector
-    - Existing example: WebSockets, EventSource (SSE)
-    - TODO: decide how the realtime connections should specify a websocket/SSE server
-    - TODO: decide how the websocket/SEE server should be ran, also coded in Lisp ? there should be a way to decouple them from the main application server to be deployed as separate edge nodes to distribute websocket/SEE connections between different backend hosts (probably leverage the backend JSON-RPC2 endpoint optional splitting to design how the websocket/SSE server backend can be created as integrated with a JSON-RPC2 backend deployment or as its own standalone backend deployment)
+ - Serverside realtime type-safe data streaming support
+    - Can be configured to be one-way (simplex server-to-client) or two way (full duplex)
+        - One-way will use SSE
+        - Two-way will use Websocket
+    - Must be hardered as it present a new potential attack vector with unique complications compared to the JSON-RPC2 endpoints
+    - Realtime endpoints are defined in .server.lisp files using `define-realtime`
+    - The foundational web-server supports running websocket/SSE connections alongside the JSON-RPC2 endpoint connections
+      - There are 3 different modes for the web-server:
+         1. Dedicated JSON-RPC2 HTTP endpoint mode
+         2. Dedicated websocket/SSE high concurrent long connections mode
+         3. Hybrid of the previous 2 modes (supports both types of connections on the same web-server)
+      - If there are `define-realtime` and `define-server-function` JSON-RPC2 endpoints on this specific server deployment segment:
+         - Start-up the web-server in hybrid websocket/SSE + JSON-RPC2 endpoints mode
+      - If there are only `define-server-function` JSON-RPC2 endpoints on this specific server deployment segment:
+         - Start-up the web-server in dedicated JSON-RPC2 endpoints mode
+      - If there are only `define-realtime` endpoints on this specific server deployment segment:
+         - Start-up the web-server in websocket/SSE only mode
+    - EXAMPLES:
 ```lisp
 ;; server
 ...
