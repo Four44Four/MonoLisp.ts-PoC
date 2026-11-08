@@ -1,12 +1,11 @@
 # TODO list
-
+# Simpler things
  - Add an explicit simple server-function and frontend usage pair example in the README's Quick Start section that exemplifies the type safe drift prevention mechanism in this framework
 
- - Optionally integrate Quicklisp and other ASDF systems into the backend as library packages/dependencies
-    - Must respect existing framework philosophies about tight type control and integration into the existing server functions system
+ - Change the frontend Lisp raw JS object indicator from `'{}` to just `{}` (update in documentation, tests, source code, skills, and examples)
 
  - `defvar` with `:multi` and `:const` support for frontend Lisp
-    - Replace any current `defvar`, `defparameter`, or `defconstant` implementation in frontend Lisp right now (check documentation, tests, source code, and examples) 
+    - Replace any current `defvar`, `defparameter`, or `defconstant` implementation in frontend Lisp right now (check documentation, tests, source code, skills, and examples) 
 ```lisp
 (defvar my-var "hi") ;; let myVar = "hi"
 (defvar :const my-var "hi") ;; const myVar = "hi"
@@ -44,12 +43,15 @@
  - Rename `define-rpc-struct` to `define-shared-struct`
     - To accomodate the use of them in both the JSON-RPC2 endpoints and the realtime data endpoints
 
+# More complex things
  - Serverside realtime data streaming support
     - Client to server
     - Server to client
     - Configurable to be simplex or full duplex
     - Must be hardened as it presents a new potential attack vector
     - Existing example: WebSockets, EventSource (SSE)
+    - TODO: decide how the realtime connections should specify a websocket server
+    - TODO: decide how the websocket server should be ran, also coded in Lisp ? there should be a way to decouple them from the main application server to be deployed as separate edge nodes to distribute websocket connections between different backend hosts
 ```lisp
 ;; server
 ...
@@ -117,6 +119,21 @@
                (:p my-int)
                (:button :onClick send-message)))))
 ```
+
+ - Add option to integrate Quicklisp and other ASDF systems into the backend as library packages/dependencies
+    - Must respect existing framework philosophies about tight type control and integration into the existing server functions system
+    - If this specification is simple:
+       - Integrate it with the other source code in this framework
+    - If this specification is complex:
+       - Make a properly named folder to put all the code for implementing such integration
+       - Make a special markdown file as a guide for Common Lisp developers working on the backend and coming from a Common Lisp development ecosystem (using Quicklisp and whatnot)
+
+ - Add hot reloading so that editing and saving shared struct definitions, endpoints, and other things will reload across the entire fullstack app
+    - (Re)transpile as little code as possible without compromising functionality to ensure that in a giant app, changing 1 small thing won't force the entire app to re-transpile
+    - Should be configurable to be on or off by default by the developer
+    - If necessary, include a markdown guide on how to handle bugs possibly resulting from hot reloading mistakes (how to clean restart the app to ensure everything gets re-transpiled)
+
+# Probably far off in the future things
 
  - Integration of a Common Lisp SQL webserver (for PostgreSQL or MySQL) for direct client to database communication with type safety
     - Client calls a normal looking function
