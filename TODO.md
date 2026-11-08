@@ -44,8 +44,13 @@
     - To accomodate the use of them in both the JSON-RPC2 endpoints and the realtime data endpoints
 
 # More complex things
- - Support splitting up a monorepo backend into different deployable backends
-    - Developer can allocate specific JSON-RPC2 functions can be ran on different backend deployments
+ - Support splitting up a monorepo backend into different deployable segments
+    - Developer can specify that a specific .server.lisp file will be part of a specific server segment
+       - Developer also has to specify in a configuration file what deployment targets/hosts the explicit segments map to (i.e. deploy one segment to a specific AWS lambda, Cloudflare worker, or a raw VPS Linux box with a custom deployment mechanism)
+       - Developer can separate testing auto deployments from production auto deployments
+          - Must be clear to developer what they are deploying to, lest they accidentally deploy an internal tool to prod
+       - By default, the .server.lisp files that are not specified to be part of any explicit server segment will be deployed on the "main node" as normal, which is the one that the developer is on right now
+          - Developer can explicitly configure their default deployment serving target to be a specific target/host through the same configuration process as configging an explicit segment to be deployed to a specific target/host
     - Include guide on how to go through the process of building these backends for development/testing and production for dummies
     - Try to make the developer-facing process as similar to deploying a monorepo as a single backend deployment
        - Contrast the differences in the guide
