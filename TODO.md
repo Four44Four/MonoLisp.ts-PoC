@@ -1,3 +1,5 @@
+# TODO list
+
  - Add an explicit simple server-function and frontend usage pair example in the README's Quick Start section that exemplifies the type safe drift prevention mechanism in this framework
 
  - Optionally integrate Quicklisp and other ASDF systems into the backend as library packages/dependencies
