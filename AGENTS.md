@@ -5,7 +5,7 @@
 ---
 
 ## 1. COMPREHENSION BOUNDARIES & SOURCE OF TRUTH
-*   **The Codebase is Niche:** The codebase is written in **Common Lisp (ANSI)**. Do not assume standard modern programming patterns (like OOP or procedural loops) apply unless explicitly defined in the documentation.
+*   **The Codebase is Niche:** The framework codebase is written in **Common Lisp (ANSI)**. Do not assume standard modern programming patterns (like OOP or procedural loops) apply unless explicitly defined in the documentation.
 *   **Documentation-First Execution:** You do not have complete spatial awareness of this repository. Before proposing any architectural mutations or generating delegation payloads, you **must query the `/docs` directory or inspect matching files in `examples/`**. 
 *   **No Exploratory File Dumps:** Do not use broad file-system searches or read entire directories. Use precise keyword grepping (`grep -n`) to pinpoint definitions, package layouts, and system configurations.
 
